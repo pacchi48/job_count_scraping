@@ -64,31 +64,7 @@ df = pd.DataFrame(data, columns=['Category', 'Job Title', 'Job Count'])
 
 df_transposed = df.T
 
-df_transposed.to_csv('mynavi.csv', header=False, index=False)
-
-# # DataFrameを整理
-# final_data = {}
-# for _, row in df.iterrows():
-#     category = row['Category']
-#     if category not in final_data:
-#         final_data[category] = {'Titles': [], 'Counts': []}
-#     final_data[category]['Titles'].append(row['Job Title'])
-#     final_data[category]['Counts'].append(row['Job Count'])
-
-# # 新しいDataFrameの作成
-# categories = list(final_data.keys())
-# titles = [title for category in categories for title in final_data[category]['Titles']]
-# counts = [count for category in categories for count in final_data[category]['Counts']]
-# new_df = pd.DataFrame({
-#     'Category': categories * len(final_data[categories[0]]['Titles']),
-#     'Job Title': titles,
-#     'Job Count': counts
-# })
-
-# # 正しく整形されたDataFrameをCSVに出力
-# new_df.to_csv('formatted_mynavi.csv', index=False)
-
-# print(new_df)
+df_transposed.to_csv('./data/mynavi.csv', header=False, index=False)
 
 # ドライバーを閉じる
 driver.quit()
