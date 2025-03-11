@@ -158,7 +158,6 @@ data = []
 for key, values in jobs.items():
     for title, val in values.items():
         url = f'https://re-katsu.jp/career/search/sch_result?p5={val}'
-        print(url)
         # 指定したURLにアクセス
         driver.get(url)
         time.sleep(1)
