@@ -9,93 +9,90 @@ import re  # 正規表現ライブラリをインポート
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
 
-# モバイルエミュレーションの設定
-mobile_emulation = {
-    "deviceMetrics": {"width": 375, "height": 812, "pixelRatio": 3.0},
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
-}
+# Chromeオプションを設定
+options = Options()
 
-chrome_options = Options()
-chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+# ボット検出回避のためのオプション
+options.add_argument("--disable-blink-features=AutomationControlled")  # Selenium検出防止
+options.add_argument("--start-maximized")  # ウィンドウを最大化
+options.add_argument("--disable-popup-blocking")  # ポップアップを無効化
+options.add_argument("--disable-infobars")  # "Chromeは自動テスト ソフトウェアによって制御されています" を非表示
+
+# User-Agentの偽装（ランダムな値を入れるとより効果的）
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36")
+
+# # Chrome DevTools Protocol (CDP) を利用して自動化フラグを無効化
+# driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+#     "source": """
+#         Object.defineProperty(navigator, 'webdriver', {
+#             get: () => undefined
+#         })
+#     """
+# })
 
 # Chrome WebDriverのセットアップ
 cService = webdriver.ChromeService(executable_path="venv/lib/python3.13/site-packages/chromedriver_binary/chromedriver")
-driver = webdriver.Chrome(service=cService, options=chrome_options)
+driver = webdriver.Chrome(service=cService, options=options)
 
 # 指定したURLにアクセス
-driver.get('https://doda.jp/')
+driver.get('https://doda.jp/DodaFront/View/JobSearchList/')
 
+# JavaScriptを使って navigator.webdriver を偽装
+driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
 # ページが完全にロードされるのを待つ
-WebDriverWait(driver, 10).until(
+WebDriverWait(driver, 100).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, "body"))
 )
 
-try:
-    # '職種'テキストを含むリンクを検索しクリック
-    job_type_link = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//li[contains(@class, 'searchType__item')]//a[.//span[contains(text(), '職種')]]"))
-    )
-    job_type_link.click()
-    time.sleep(5)
-except TimeoutException:
-    print("指定された要素が見つからないか、クリック可能な状態になりません。")
-
-try:
-    # modal__searchContent--active クラス内のすべての accordion__item 要素を見つける
-    triggers = WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located(
-            (By.CSS_SELECTOR, ".modal__searchContent--active .accordion__item")
-        )
-    )
-
-    print(len(triggers))
-    
-    # 各要素に対する操作
-    for trigger in triggers:
-        # 要素がビューポート中央に来るようにスクロール
-        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", trigger)
-        
-        time.sleep(3)
-
-        # 要素が表示されているか確認し、クリック可能であればクリック
-        if trigger.is_displayed() and trigger.is_enabled():
-            trigger.click()
-        else:
-            print("Element not interactable:", trigger.text)
-
-except Exception as e:
-    print("An error occurred:", e)
-
 data = []
-try:
-    elements = driver.find_elements(By.CSS_SELECTOR, ".accordion__content--open")
-    print(len(elements))
 
-    for element in elements:
-        # 各accordion__content--openの中の項目を取得
-        listItems = element.find_elements(By.CSS_SELECTOR, ".accordion__item")
-        if listItems:
-            # 最初の要素（大カテゴリ）を取得
-            main_category = listItems[0].find_element(By.CSS_SELECTOR, "span:nth-of-type(2)").text
+# 職種ボタン
+job_buttom = driver.find_element(By.CSS_SELECTOR, ".Button-module_button--sizeXS__FC1is.Button-module_button--grayLine__4qEY4.Button-module_button--width100__W-pdV.select-button")
+job_buttom.click()
 
-            for listItem in listItems[1:]:  # 最初の要素をスキップ
-                sub_category_text = listItem.find_element(By.CSS_SELECTOR, "span:nth-of-type(2)").text
-                count_text = listItem.find_element(By.CSS_SELECTOR, ".accordion__textOpenCount").text
-                count = re.sub(r'[（）件,]', '', count_text) # 括弧、'件'、カンマを削除し整数に変換
+wait = WebDriverWait(driver, 10)
+scroll_areas = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".modalSimpleBar")))
 
-                # print(main_category)
-                # print(sub_category_text)
-                # print(count)
-                data.append((main_category, sub_category_text, count))
+scroll_areas = driver.find_elements(By.CSS_SELECTOR, ".modalSimpleBar")
+print(len(scroll_areas))
 
-except Exception as e:
-    print("An error occurred:", e)
+l_categories = scroll_areas[0].find_elements(By.TAG_NAME, 'li')
+print(len(l_categories))
 
-print(data)
+for l_cate in l_categories:
+    # カテゴリをクリック
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", l_cate)
+    l_cate.click()
+
+    l_cate_name = l_cate.find_element(By.CSS_SELECTOR, '.occupationCategoryItem__title.occupationCategoryItem__title--selected').text
+
+    # アクティブな中カテゴリを取得
+    scroll_areas = driver.find_elements(By.CSS_SELECTOR, ".modalSimpleBar")[1]
+    m_cate_els = driver.find_elements(By.CSS_SELECTOR, ".checkboxItemM")
+
+    for m_cate in m_cate_els:
+        # 中カテゴリ名
+        m_cate_val = m_cate.find_element(By.CSS_SELECTOR, '.checkboxItemM__title').text
+        count_element = m_cate.find_element(By.CSS_SELECTOR, ".checkboxItemM__numberOfJobs").text
+        m_cate_name = m_cate_val.replace(count_element, "").strip()
+
+        # 小カテゴリ群
+        s_cate_els = m_cate.find_elements(By.CSS_SELECTOR, '.checkboxItemS')
+        for s_cate in s_cate_els:
+            # 小カテゴリ名
+            s_cate_name = s_cate.find_element(By.CSS_SELECTOR, '.checkboxItemS__title').text
+            # 小カテゴリ数
+            s_cate_count = s_cate.find_element(By.CSS_SELECTOR, '.checkboxItemS__numberOfJobs').text
+            s_cate_name = s_cate_name.replace(s_cate_count, "").strip()
+
+            count = int(re.sub(r'[(),]', '', s_cate_count))
+
+            # データを追加
+            data.append([l_cate_name, m_cate_name, s_cate_name, count])
 
 # DataFrameの作成
-df = pd.DataFrame(data, columns=['Category', 'Job Title', 'Job Count'])
+df = pd.DataFrame(data, columns=['L', 'M', 'S', 'count'])
 
 df_transposed = df.T
 
