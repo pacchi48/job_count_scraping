@@ -112,3 +112,5 @@ df_transposed.to_csv('./data/onnna.csv', header=False, index=False)
 
 # ドライバーを閉じる
 driver.quit()
+
+print('正常終了')

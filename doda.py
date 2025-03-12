@@ -55,10 +55,7 @@ wait = WebDriverWait(driver, 10)
 scroll_areas = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".modalSimpleBar")))
 
 scroll_areas = driver.find_elements(By.CSS_SELECTOR, ".modalSimpleBar")
-print(len(scroll_areas))
-
 l_categories = scroll_areas[0].find_elements(By.TAG_NAME, 'li')
-print(len(l_categories))
 
 for l_cate in l_categories:
     # カテゴリをクリック
@@ -99,3 +96,5 @@ df_transposed = df.T
 df_transposed.to_csv('./data/doda.csv', header=False, index=False)
 
 driver.quit()
+
+print('正常終了')

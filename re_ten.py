@@ -177,3 +177,5 @@ df_transposed.to_csv('./data/re_ten.csv', header=False, index=False)
 
 # ドライバーを閉じる
 driver.quit()
+
+print('正常終了')
