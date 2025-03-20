@@ -8,11 +8,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 
 # Chrome WebDriverのセットアップ
-cService = webdriver.ChromeService(executable_path="venv/lib/python3.13/site-packages/chromedriver_binary/chromedriver")
+cService = webdriver.ChromeService()
 driver = webdriver.Chrome(service=cService)
 
 # 指定したURLにアクセス
 driver.get('https://tenshoku.mynavi.jp/list/')
+
+wait = WebDriverWait(driver, 10)  # 最大10秒待機
 
 # 全てのクラス名を含むCSSセレクタを使ってボタンを見つける
 button = driver.find_element(By.CSS_SELECTOR, ".btnAddS.js__jobCheckbox")
@@ -31,6 +33,7 @@ for category in categories:
     l_cate = category.text
 
     # 大カテゴリをクリック
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category)
     category.click()
 
     # 画面遷移待機
@@ -72,6 +75,8 @@ for category in categories:
            data.append([l_cate, m_cate, s_cate, count])
 
            # 職種ボタンを押下し、モーダルを開く
+           button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".btnAddS.js__jobCheckbox")))
+           driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
            button.click()
 
            time.sleep(2)  # 1秒間プログラムを停止
