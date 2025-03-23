@@ -9,7 +9,7 @@ import re  # 正規表現ライブラリをインポート
 from selenium.webdriver.chrome.options import Options
 
 # Chrome WebDriverのセットアップ
-cService = webdriver.ChromeService(executable_path="venv/lib/python3.13/site-packages/chromedriver_binary/chromedriver")
+cService = webdriver.ChromeService()
 driver = webdriver.Chrome(service=cService)
 
 # 指定したURLにアクセス

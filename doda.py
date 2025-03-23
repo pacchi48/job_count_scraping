@@ -31,7 +31,7 @@ options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
 # })
 
 # Chrome WebDriverのセットアップ
-cService = webdriver.ChromeService(executable_path="venv/lib/python3.13/site-packages/chromedriver_binary/chromedriver")
+cService = webdriver.ChromeService()
 driver = webdriver.Chrome(service=cService, options=options)
 
 # 指定したURLにアクセス

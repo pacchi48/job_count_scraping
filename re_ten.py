@@ -19,7 +19,7 @@ chrome_options = Options()
 chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
 
 # Chrome WebDriverのセットアップ
-cService = webdriver.ChromeService(executable_path="venv/lib/python3.13/site-packages/chromedriver_binary/chromedriver")
+cService = webdriver.ChromeService()
 driver = webdriver.Chrome(service=cService, options=chrome_options)
 
 jobs = {
