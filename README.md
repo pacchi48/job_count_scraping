@@ -55,13 +55,6 @@
     ```
 4. run_all.pyを実行する。
 
-    ```
-    pythonのpath run_all.pyのpath
-
-    例
-    /Users/yu-suzuki/Project/job_count_csv/venv/bin/python /Users/yu-suzuki/Project/j
-ob_count_csv/run_all.py
-    ```
 
 5. data配下にcsvが出力されるので、それをスプレッドシートにインポート
 
