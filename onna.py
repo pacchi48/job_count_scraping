@@ -48,7 +48,7 @@ try:
         title = area.find_elements(By.CSS_SELECTOR, ".accordion-title")
         driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", title[0])
         title[0].click()
-        l_cate = title[0].text
+        l_cate = title[0].find_element(By.CSS_SELECTOR, ".accordion-title-main").text
 
         # listを取得
         accordion_div = area.find_element(By.CSS_SELECTOR, "div.accordion-inner")
@@ -63,7 +63,7 @@ try:
             label_element.click()
 
             # 中カテゴリ
-            m_cate = label_element.text
+            m_cate = label_element.text.replace("\n", "")
 
             time.sleep(1)  # 1秒間プログラムを停止
 
