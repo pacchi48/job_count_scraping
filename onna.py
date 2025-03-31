@@ -26,12 +26,12 @@ driver = webdriver.Chrome(service=cService, options=chrome_options)
 # 指定したURLにアクセス
 driver.get('https://woman-type.jp/job-search/?routeway=82')
 
-# data-target が job-selection-content の a 要素を取得する
-element = driver.find_element(
+# 職種を選択ボタンを押下
+job_buttom = driver.find_elements(
         By.CSS_SELECTOR, 
-        "a.js-toggle.link-button.-type04.-left[href='#hope-job']"
-    )
-element.click()
+        ".condition-configured"
+    )[0]
+job_buttom.click()
 
 time.sleep(3)  # 1秒間プログラムを停止
 
@@ -70,25 +70,25 @@ try:
             # 追加ボタンをクリック
             add_button = driver.find_element(
                 By.CSS_SELECTOR,
-                "a.js-toggle-close.link-button.-type02[href='#hope-job']"
+                "a.js-toggle-close-search.link-button.-type07[href='#hope-job']"
             )
             add_button.click()
 
             time.sleep(1)  # 1秒間プログラムを停止
 
             # 結果件数
-            count_elem = driver.find_element(By.CSS_SELECTOR, "div.result span.count")
+            count_elem = driver.find_element(By.CSS_SELECTOR, ".result-count")
             count_value = count_elem.text
 
             # dataの追加
             data.append((l_cate, m_cate, count_value))
 
-            # 職種を追加を押下
-            element = driver.find_element(
+            # 職種を選択を押下
+            job_buttom = driver.find_elements(
                     By.CSS_SELECTOR, 
-                    "a.js-toggle.link-button.-type04.-left[href='#hope-job']"
-                )
-            element.click()
+                    ".condition-configured"
+                )[0]
+            job_buttom.click()
 
             time.sleep(1)  # 1秒間プログラムを停止
 
